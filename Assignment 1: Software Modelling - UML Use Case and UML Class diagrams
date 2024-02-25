@@ -1,0 +1,152 @@
+class Passenger:
+    def __init__(self, name, ff_num, seat_pref):
+        self._name = name
+        self._ff_num = ff_num
+        self._seat_pref = seat_pref
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def ff_num(self):
+        return self._ff_num
+
+    @ff_num.setter
+    def ff_num(self, value):
+        self._ff_num = value
+
+    @property
+    def seat_pref(self):
+        return self._seat_pref
+
+    @seat_pref.setter
+    def seat_pref(self, value):
+        self._seat_pref = value
+
+class Flight:
+    def __init__(self, flight_num, departure, arrival, origin, destination):
+        self._num = flight_num
+        self._dep = departure
+        self._arr = arrival
+        self._org = origin
+        self._dest = destination
+
+    @property
+    def num(self):
+        return self._num
+
+    @num.setter
+    def num(self, value):
+        self._num = value
+
+    @property
+    def dep(self):
+        return self._dep
+
+    @dep.setter
+    def dep(self, value):
+        self._dep = value
+
+    @property
+    def arr(self):
+        return self._arr
+
+    @arr.setter
+    def arr(self, value):
+        self._arr = value
+
+    @property
+    def org(self):
+        return self._org
+
+    @org.setter
+    def org(self, value):
+        self._org = value
+
+    @property
+    def dest(self):
+        return self._dest
+
+    @dest.setter
+    def dest(self, value):
+        self._dest = value
+
+class BoardingPass:
+    def __init__(self, seat, board_time, flight, passenger):
+        self._seat = seat
+        self._board_time = board_time
+        self._flight = flight
+        self._passenger = passenger
+
+    def display(self):
+        print(f"Passenger: {self._passenger.name}")
+        print(f"Flight: {self._flight.num}")
+        print(f"From: {self._flight.org} To: {self._flight.dest}")
+        print(f"Departure: {self._flight.dep}")
+        print(f"Arrival: {self._flight.arr}")
+        print(f"Gate: {self._board_time}")
+        print(f"Seat: {self._seat}")
+
+    @property
+    def seat(self):
+        return self._seat
+
+    @seat.setter
+    def seat(self, value):
+        self._seat = value
+
+    @property
+    def board_time(self):
+        return self._board_time
+
+    @board_time.setter
+    def board_time(self, value):
+        self._board_time = value
+
+class Airline:
+    def __init__(self, name, code):
+        self._name = name
+        self._code = code
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def code(self):
+        return self._code
+
+    @code.setter
+    def code(self, value):
+        self._code = value
+
+# Create objects for each class
+airline = Airline("National Airlines", "123456")
+passenger = Passenger("James Smith", "546BCD78", "09A")
+flight = Flight("NA4321", "2020-12-06 11:40", "2020-12-06 13:30", "Chicago ORD", "New York JFK")
+boarding_pass = BoardingPass("09A", "2020-12-06 11:20", flight, passenger)
+
+boarding_pass.display()
+print(" ")
+print("Usage of Setter and Getter:")
+# Set
+airline.name = "Emirates Airlines"
+passenger.name = "Ahmad Sajwani"
+flight.org = "United Arab Emirates"
+
+# Get
+print(passenger.name)
+print(flight.org)
+print(airline.name)
+print(" ")
+print("After setting:")
+boarding_pass.display()
