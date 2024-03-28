@@ -1,0 +1,86 @@
+def test_add_artwork():
+    artwork_manager = ArtworkManager()
+    artwork = Artwork("Starry Night", "Vincent van Gogh", "1889", "Post-Impressionism", "Permanent Gallery")
+    artwork_manager.add_artwork(artwork)
+    assert len(artwork_manager.artworks) == 1, "Artwork was not added correctly."
+    print("Test add artwork: Passed")
+
+# Test case for adding an exhibition
+def test_add_exhibition():
+    artwork_manager = ArtworkManager()
+    artworks = [Artwork("The Night Café", "Vincent van Gogh", "1888", "Post-Impressionism", "Exhibition Hall")]
+    exhibition = Exhibition("Van Gogh's Night Scapes", artworks, "2024-01-01", "2024-06-01", "Exhibition Hall")
+    artwork_manager.add_exhibition(exhibition)
+    assert len(artwork_manager.exhibitions) == 1, "Exhibition was not added correctly."
+    print("Test add exhibition: Passed")
+
+# Test case for visitor ticket purchase
+def test_ticket_purchase():
+    visitor_manager = VisitorManager()
+    visitor = Visitor("Ali", 28, "adult", "987654321")
+    visitor_manager.add_visitor(visitor)
+    ticket = visitor_manager.purchase_ticket("Van Gogh's Night Scapes", "987654321", 100, "2024-01-15", "Exhibition Hall")
+    assert ticket is not None and ticket.price == 105.0, "Ticket purchase failed."
+    print("Test ticket purchase: Passed")
+
+# Test case for special event ticket purchase
+def test_special_event_ticket_purchase():
+    visitor_manager = VisitorManager()
+    visitor = Visitor("Rashid Saif", 45, "adult", "123456789")
+    visitor_manager.add_visitor(visitor)
+    # Special event with a fixed price
+    ticket = visitor_manager.purchase_ticket("Museum Gala Night", "123456789", 150, "2024-12-24", "Main Hall", is_special_event=True)
+    assert ticket is not None and ticket.price == 150, "Special event ticket purchase failed."
+    print("Test special event ticket purchase: Passed")
+
+# Test case for displaying a payment receipt
+def test_display_payment_receipt():
+    visitor_manager = VisitorManager()
+    visitor = Visitor("Mohammed", 32, "adult", "192837465")
+    visitor_manager.add_visitor(visitor)
+    ticket = visitor_manager.purchase_ticket("Impressionism Exhibition", "192837465", 120, "2024-03-21", "Exhibition Hall")
+    assert ticket is not None, "Failed to purchase ticket for receipt display."
+    receipt = f"Receipt:\nEvent: {ticket.event_name}\nVisitor: {ticket.visitor_name}\nPrice: {ticket.price} AED\nDate: {ticket.event_date}\nLocation: {ticket.location}"
+    print(receipt)
+    print("Test display payment receipt: Passed")
+
+if __name__ == "__main__":
+    test_add_artwork()
+    test_add_exhibition()
+    test_ticket_purchase()
+    test_special_event_ticket_purchase()
+    test_display_payment_receipt()
+
+def test_system():
+    # Setup
+    artwork_manager = ArtworkManager()
+    visitor_manager = VisitorManager()
+
+    # Test adding artwork
+    mona_lisa = Artwork("Mona Lisa", "Leonardo da Vinci", "1503", "Renaissance masterpiece", "Permanent Gallery")
+    artwork_manager.add_artwork(mona_lisa)
+    assert len(artwork_manager.artworks) == 1, "Failed to add artwork"
+
+    # Test adding exhibition
+    impressionism_exhibition = Exhibition("Impressionism", [mona_lisa], "2023-01-01", "2023-06-01", "Exhibition Hall")
+    artwork_manager.add_exhibition(impressionism_exhibition)
+    assert len(artwork_manager.exhibitions) == 1, "Failed to add exhibition"
+
+    # Test searching and displaying artwork details
+    artwork_manager.display_artwork_details("Mona Lisa")
+
+    # Test ticket purchase
+    visitor = Visitor("Ahmad Aqil", 18, "adult", "202220032")
+    visitor_manager.add_visitor(visitor)
+    ticket = visitor_manager.purchase_ticket("Impressionism", "202220032", 63, "2024-02-15", "Exhibition Hall")
+    assert ticket is not None, "Failed to purchase ticket"
+    assert ticket.price == 66.15, "Incorrect ticket price"
+
+    # Display payment receipt for purchased ticket
+    if ticket:
+        print(f"Receipt:\nEvent: {ticket.event_name}\nVisitor: {ticket.visitor_name}\nPrice: {ticket.price} AED\nDate: {ticket.event_date}\nLocation: {ticket.location}")
+    else:
+        print("Failed to generate receipt.")
+
+if __name__ == "__main__":
+    test_system()
