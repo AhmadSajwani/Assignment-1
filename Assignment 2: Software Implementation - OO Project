@@ -1,0 +1,109 @@
+# Represents an artwork with relevant details
+class Artwork:
+    # Constructor for the Artwork class initializing its properties
+    def __init__(self, title, artist, creation_date, historical_significance, location):
+        self.title = title  # Title of the artwork
+        self.artist = artist  # Artist who created the artwork
+        self.creation_date = creation_date  # Date when the artwork was created
+        self.historical_significance = historical_significance  # The historical importance of the artwork
+        self.location = location  # The location of the artwork within the museum
+
+# Represents an exhibition, which is a collection of artworks
+class Exhibition:
+    # Constructor for the Exhibition class initializing its properties
+    def __init__(self, name, artworks, start_date, end_date, location):
+        self.name = name  # Name of the exhibition
+        self.artworks = artworks  # List of Artwork objects in the exhibition
+        self.start_date = start_date  # Start date of the exhibition
+        self.end_date = end_date  # End date of the exhibition
+        self.location = location  # Location of the exhibition within the museum
+
+# Manages the collection of artworks and exhibitions
+class ArtworkManager:
+    # Constructor for the ArtworkManager class initializing its collections
+    def __init__(self):
+        self.artworks = []  # A list to store all artworks
+        self.exhibitions = []  # A list to store all exhibitions
+
+    # Adds an artwork to the collection
+    def add_artwork(self, artwork):
+        self.artworks.append(artwork)
+
+    # Adds an exhibition to the collection
+    def add_exhibition(self, exhibition):
+        self.exhibitions.append(exhibition)
+
+    # Searches for an artwork by its title
+    def search_artwork(self, title):
+        for artwork in self.artworks:
+            if artwork.title.lower() == title.lower():
+                return artwork
+        return None
+
+    # Displays the details of an artwork
+    def display_artwork_details(self, title):
+        artwork = self.search_artwork(title)
+        if artwork:
+            # Prints details of the artwork
+            print(f"Title: {artwork.title}")
+            print(f"Artist: {artwork.artist}")
+            print(f"Creation Date: {artwork.creation_date}")
+            print(f"Historical Significance: {artwork.historical_significance}")
+            print(f"Location: {artwork.location}")
+        else:
+            print("Artwork not found.")
+
+# Represents a museum visitor
+class Visitor:
+    # Constructor for the Visitor class initializing its properties
+    def __init__(self, name, age, category, id_number):
+        self.name = name  # Name of the visitor
+        self.age = age  # Age of the visitor
+        self.category = category  # Category of the visitor (e.g., adult, child)
+        self.id_number = id_number  # Identification number of the visitor
+
+# Represents a ticket for an event or exhibition
+class Ticket:
+    # Constructor for the Ticket class initializing its properties
+    def __init__(self, event_name, visitor_name, price, event_date, location):
+        self.event_name = event_name  # Name of the event or exhibition
+        self.visitor_name = visitor_name  # Name of the visitor who purchased the ticket
+        self.price = price  # Price of the ticket
+        self.event_date = event_date  # Date of the event
+        self.location = location  # Location where the event is held
+
+# Manages museum visitors and ticketing
+class VisitorManager:
+    # Constructor for the VisitorManager class initializing its collections
+    def __init__(self):
+        self.visitors = {}  # A dictionary to store visitors using their ID as the key
+        self.tickets = []  # A list to store all issued tickets
+
+    # Adds a visitor to the collection
+    def add_visitor(self, visitor):
+        self.visitors[visitor.id_number] = visitor
+
+    # Processes the purchase of a ticket for a visitor
+    def purchase_ticket(self, event_name, visitor_id, base_price, event_date, location, is_special_event=False):
+        visitor = self.visitors.get(visitor_id)
+        if visitor:
+            # Calculates final ticket price based on visitor category and special event status
+            price = self.calculate_ticket_price(base_price, visitor.category, is_special_event)
+            ticket = Ticket(event_name, visitor.name, price, event_date, location)
+            self.tickets.append(ticket)
+            return ticket
+        else:
+            return None
+
+    # Calculates the ticket price based on visitor category and special event status
+    def calculate_ticket_price(self, base_price, category, is_special_event):
+        if is_special_event:
+            return base_price  # Special events have a fixed price
+        if category in ['child', 'teacher/student', 'senior']:
+            return 0
+        elif category == 'group':
+            price_before_vat = base_price * 0.5
+        else:  # Adult
+            price_before_vat = base_price
+        final_price = price_before_vat * 1.05  # Applying 5% VAT
+        return final_price
