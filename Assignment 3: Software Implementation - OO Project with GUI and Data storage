@@ -1,0 +1,813 @@
+import pickle  # Imports the pickle module for object serialization
+from datetime import datetime, timedelta  # Imports datetime and timedelta from the datetime module
+import tkinter as tk  # Imports the tkinter module for creating GUI applications
+from tkinter import ttk  # Imports themed widgets from tkinter
+from tkinter import messagebox  # Imports messagebox for easy generation of informational and error dialogs
+import uuid  # Imports uuid module for generating unique identifiers
+
+# Employee class definition
+
+class Employee:
+    # Constructor with initialization for employee details
+    def __init__(self, name, employee_id, department, job_title, basic_salary, age, date_of_birth, passport_details, manager_id):
+        self.name = name
+        self.employee_id = employee_id
+        self.department = department
+        self.job_title = job_title
+        self.basic_salary = basic_salary
+        self.age = age
+        self.date_of_birth = date_of_birth
+        self.passport_details = passport_details
+        self.manager_id = manager_id
+
+    # Method to return employee details in a formatted dictionary
+    def display(self):
+        return {
+            "Name": self.name,
+            "Employee ID": self.employee_id,
+            "Department": self.department,
+            "Job Title": self.job_title,
+            "Basic Salary": self.basic_salary,
+            "Age": self.age,
+            "Date of Birth": self.date_of_birth.strftime("%Y-%m-%d"),
+            "Passport Details": self.passport_details,
+            "Manager ID": self.manager_id
+        }
+
+# EmployeeManager class for managing employee data
+class EmployeeManager:
+    def __init__(self):
+        self.employees = {}  # Initializes an empty dictionary to store employee data
+        self.load_employees()  # Loads employee data from a file
+
+    def add_employee(self, employee):
+        if employee.employee_id in self.employees:
+            raise KeyError("Employee ID already exists.")  # Checks for duplicate employee ID
+        self.employees[employee.employee_id] = employee  # Adds new employee to the dictionary
+
+    def delete_employee(self, employee_id):
+        if employee_id in self.employees:
+            del self.employees[employee_id]  # Removes employee by ID
+        else:
+            raise KeyError("Employee not found.")  # Error if employee ID does not exist
+
+    def get_employee(self, employee_id):
+        if employee_id in self.employees:
+            return self.employees[employee_id].display()  # Returns formatted display of employee details
+        else:
+            raise KeyError("Employee not found.")  # Error if employee ID does not exist
+
+    def save_employees(self):
+        with open('employees.pkl', 'wb') as file:  # Opens a file in write-binary mode
+            pickle.dump(self.employees, file)  # Serializes and saves the employees dictionary to file
+
+    def load_employees(self):
+        try:
+            with open('employees.pkl', 'rb') as file:  # Opens a file in read-binary mode
+                self.employees = pickle.load(file)  # Loads and deserializes the employees dictionary from file
+        except FileNotFoundError:
+            self.employees = {}  # Initializes employees as an empty dictionary if file not found
+
+# Client class definition
+class Client:
+    def __init__(self, client_id, name, address, contact_details, budget):
+        self.client_id = client_id  # Assigns the unique identifier to the client
+        self.name = name  # Assigns the name to the client
+        self.address = address  # Assigns the address to the client
+        self.contact_details = contact_details  # Assigns the contact details to the client
+        self.budget = budget  # Assigns the budget to the client
+
+    def display(self):
+        return {
+            "Client ID": self.client_id,  # Returns client ID
+            "Name": self.name,  # Returns client name
+            "Address": self.address,  # Returns client address
+            "Contact Details": self.contact_details,  # Returns contact details
+            "Budget": self.budget  # Returns budget
+        }
+
+class ClientManager:
+    def __init__(self):
+        self.clients = {} # Initializes an empty dictionary to store client data
+        self.load_clients() # Loads client data from a file
+
+    def add_client(self, client):
+        if client.client_id in self.clients:
+            raise KeyError("Client ID already exists.") # Checks for duplicate client ID before adding
+        self.clients[client.client_id] = client # Adds new client to the dictionary
+
+    def delete_client(self, client_id):
+        if client_id in self.clients:
+            del self.clients[client_id]  # Deletes client from dictionary if found
+        else:
+            raise KeyError("Client not found.")  # Raises an error if client ID is not found
+
+    def get_client(self, client_id):
+        if client_id in self.clients:
+            return self.clients[client_id].display()  # Returns the display info of the client
+        else:
+            raise KeyError("Client not found.")  # Raises an error if client ID is not found
+
+    def save_clients(self):
+        with open('clients.pkl', 'wb') as file:
+            pickle.dump(self.clients, file)  # Serializes and saves the clients dictionary to a file
+
+    def load_clients(self):
+        try:
+            with open('clients.pkl', 'rb') as file:
+                self.clients = pickle.load(file)  # Loads and deserializes the clients dictionary from file
+        except FileNotFoundError:
+            self.clients = {}  # Resets clients to an empty dictionary if file is not found
+
+
+class Event:
+    def __init__(self, event_id, name, date, venue_id, description):
+        self.event_id = event_id  # Assigns a unique identifier to the event
+        self.name = name  # Sets the name of the event
+        self.date = date  # Sets the date of the event
+        self.venue_id = venue_id  # Links the event to a specific venue by its ID
+        self.description = description  # Provides a description for the event
+
+    def display(self):
+        return {
+            "Event ID": self.event_id,  # Returns the event ID
+            "Name": self.name,  # Returns the name of the event
+            "Date": self.date.strftime("%Y-%m-%d"),  # Formats the date and returns it as a string
+            "Venue ID": self.venue_id,  # Returns the venue ID
+            "Description": self.description  # Returns the description of the event
+        }
+
+class EventManager:
+    def __init__(self):
+        self.events = {}  # Initializes an empty dictionary to store event data
+        self.load_events()  # Loads event data from a file
+
+    def add_event(self, event):
+        if event.event_id in self.events:
+            raise KeyError("Event ID already exists.")  # Checks for duplicate event ID before adding
+        self.events[event.event_id] = event  # Adds new event to the dictionary
+
+    def delete_event(self, event_id):
+        if event_id in self.events:
+            del self.events[event_id]  # Deletes event from dictionary if found
+        else:
+            raise KeyError("Event not found.")  # Raises an error if event ID is not found
+
+    def get_event(self, event_id):
+        if event_id in self.events:
+            return self.events[event_id].display()  # Returns the display info of the event
+        else:
+            raise KeyError("Event not found.")  # Raises an error if event ID is not found
+
+    def save_events(self):
+        with open('events.pkl', 'wb') as file:
+            pickle.dump(self.events, file)  # Serializes and saves the events dictionary to a file
+
+    def load_events(self):
+        try:
+            with open('events.pkl', 'rb') as file:
+                self.events = pickle.load(file)  # Loads and deserializes the events dictionary from file
+        except FileNotFoundError:
+            self.events = {}  # Resets events to an empty dictionary if file is not found
+
+class Venue:
+    def __init__(self, venue_id, name, location, capacity):
+        self.venue_id = venue_id  # Assigns a unique identifier to the venue
+        self.name = name  # Sets the name of the venue
+        self.location = location  # Sets the location of the venue
+        self.capacity = capacity  # Sets the capacity of the venue (e.g., number of people it can accommodate)
+
+    def display(self):
+        return {
+            "Venue ID": self.venue_id,  # Returns the venue ID
+            "Name": self.name,  # Returns the name of the venue
+            "Location": self.location,  # Returns the location of the venue
+            "Capacity": self.capacity  # Returns the capacity of the venue
+        }
+
+class VenueManager:
+    def __init__(self):
+        self.venues = {}  # Initializes an empty dictionary to store venue data
+        self.load_venues()  # Calls the method to load venues from a file
+
+    def add_venue(self, venue):
+        if venue.venue_id in self.venues:
+            raise KeyError("Venue ID already exists.")  # Checks for duplicate venue ID before adding
+        self.venues[venue.venue_id] = venue  # Adds the new venue to the dictionary
+
+    def delete_venue(self, venue_id):
+        if venue_id in self.venues:
+            del self.venues[venue_id]  # Deletes venue from dictionary if found
+        else:
+            raise KeyError("Venue not found.")  # Raises an error if venue ID is not found
+
+    def get_venue(self, venue_id):
+        if venue_id in self.venues:
+            return self.venues[venue_id].display()  # Returns the display info of the venue
+        else:
+            raise KeyError("Venue not found.")  # Raises an error if venue ID is not found
+
+    def save_venues(self):
+        with open('venues.pkl', 'wb') as file:
+            pickle.dump(self.venues, file)  # Serializes and saves the venues dictionary to a file
+
+    def load_venues(self):
+        try:
+            with open('venues.pkl', 'rb') as file:
+                self.venues = pickle.load(file)  # Loads and deserializes the venues dictionary from file
+        except FileNotFoundError:
+            self.venues = {}  # Resets venues to an empty dictionary if file is not found
+
+class Supplier:
+    def __init__(self, supplier_id, name, address, contact_details):
+        self.supplier_id = supplier_id  # Assigns a unique identifier to the supplier
+        self.name = name  # Sets the name of the supplier
+        self.address = address  # Sets the address of the supplier
+        self.contact_details = contact_details  # Sets the contact details of the supplier
+
+    def display(self):
+        return {
+            "Supplier ID": self.supplier_id,  # Returns the supplier ID
+            "Name": self.name,  # Returns the name of the supplier
+            "Address": self.address,  # Returns the address of the supplier
+            "Contact Details": self.contact_details  # Returns the contact details of the supplier
+        }
+
+class SupplierManager:
+    def __init__(self):
+        self.suppliers = {}  # Initializes an empty dictionary to store supplier data
+        self.load_suppliers()  # Calls the method to load suppliers from a file
+
+    def add_supplier(self, supplier):
+        if supplier.supplier_id in self.suppliers:
+            raise KeyError("Supplier ID already exists.")  # Checks for duplicate supplier ID before adding
+        self.suppliers[supplier.supplier_id] = supplier  # Adds the new supplier to the dictionary
+
+    def delete_supplier(self, supplier_id):
+        if supplier_id in self.suppliers:
+            del self.suppliers[supplier_id]  # Deletes supplier from dictionary if found
+        else:
+            raise KeyError("Supplier not found.")  # Raises an error if supplier ID is not found
+
+    def get_supplier(self, supplier_id):
+        if supplier_id in self.suppliers:
+            return self.suppliers[supplier_id].display()  # Returns the display info of the supplier
+        else:
+            raise KeyError("Supplier not found.")  # Raises an error if supplier ID is not found
+
+    def save_suppliers(self):
+        with open('suppliers.pkl', 'wb') as file:
+            pickle.dump(self.suppliers, file)  # Serializes and saves the suppliers dictionary to a file
+
+    def load_suppliers(self):
+        try:
+            with open('suppliers.pkl', 'rb') as file:
+                self.suppliers = pickle.load(file)  # Loads and deserializes the suppliers dictionary from file
+        except FileNotFoundError:
+            self.suppliers = {}  # Resets suppliers to an empty dictionary if file is not found
+
+class Guest:
+    def __init__(self, guest_id, name, address, contact_details):
+        self.guest_id = guest_id  # Assigns a unique identifier to the guest
+        self.name = name  # Sets the name of the guest
+        self.address = address  # Sets the address of the guest
+        self.contact_details = contact_details  # Sets the contact details of the guest
+
+    def display(self):
+        return {
+            "Guest ID": self.guest_id,  # Returns the guest ID
+            "Name": self.name,  # Returns the name of the guest
+            "Address": self.address,  # Returns the address of the guest
+            "Contact Details": self.contact_details  # Returns the contact details of the guest
+        }
+
+class GuestManager:
+    def __init__(self):
+        self.guests = {}  # Initializes an empty dictionary to store guest data
+        self.load_guests()  # Calls the method to load guests from a file
+
+    def add_guest(self, guest):
+        if guest.guest_id in self.guests:
+            raise KeyError("Guest ID already exists.")  # Checks for duplicate guest ID before adding
+        self.guests[guest.guest_id] = guest  # Adds the new guest to the dictionary
+
+    def delete_guest(self, guest_id):
+        if guest_id in self.guests:
+            del self.guests[guest_id]  # Deletes guest from dictionary if found
+        else:
+            raise KeyError("Guest not found.")  # Raises an error if guest ID is not found
+
+    def get_guest(self, guest_id):
+        if guest_id in self.guests:
+            return self.guests[guest_id].display()  # Returns the display info of the guest
+        else:
+            raise KeyError("Guest not found.")  # Raises an error if guest ID is not found
+
+    def save_guests(self):
+        with open('guests.pkl', 'wb') as file:
+            pickle.dump(self.guests, file)  # Serializes and saves the guests dictionary to a file
+
+    def load_guests(self):
+        try:
+            with open('guests.pkl', 'rb') as file:
+                self.guests = pickle.load(file)  # Loads and deserializes the guests dictionary from file
+        except FileNotFoundError:
+            self.guests = {}  # Resets guests to an empty dictionary if file is not found
+
+
+class MainApplication(tk.Tk):
+    def __init__(self):
+        super().__init__()  # Calls the constructor of the parent class (tk.Tk)
+        self.title("Event Management System")  # Sets the window title
+        self.geometry("800x600")  # Sets the window size to 800x600 pixels
+
+        self.employee_manager = EmployeeManager()  # Initializes the employee manager
+        self.client_manager = ClientManager()  # Initializes the client manager
+        self.event_manager = EventManager()  # Initializes the event manager
+        self.venue_manager = VenueManager()  # Initializes the venue manager
+        self.supplier_manager = SupplierManager()  # Initializes the supplier manager
+        self.guest_manager = GuestManager()  # Initializes the guest manager
+
+        tab_control = ttk.Notebook(self)  # Creates a tabbed notebook widget
+        self.employee_tab = ttk.Frame(tab_control)  # Creates a frame for the employee tab
+        self.client_tab = ttk.Frame(tab_control)  # Creates a frame for the client tab
+        self.event_tab = ttk.Frame(tab_control)  # Creates a frame for the event tab
+        self.venue_tab = ttk.Frame(tab_control)  # Creates a frame for the venue tab
+        self.supplier_tab = ttk.Frame(tab_control)  # Creates a frame for the supplier tab
+        self.guest_tab = ttk.Frame(tab_control)  # Creates a frame for the guest tab
+        tab_control.add(self.employee_tab, text='Employees')  # Adds the employee tab to the notebook
+        tab_control.add(self.client_tab, text='Clients')  # Adds the client tab to the notebook
+        tab_control.add(self.event_tab, text='Events')  # Adds the event tab to the notebook
+        tab_control.add(self.venue_tab, text='Venues')  # Adds the venue tab to the notebook
+        tab_control.add(self.supplier_tab, text='Suppliers')  # Adds the supplier tab to the notebook
+        tab_control.add(self.guest_tab, text='Guests')  # Adds the guest tab to the notebook
+        self.build_employee_tab()  # Calls the method to build the employee tab
+        self.build_client_tab()  # Calls the method to build the client tab
+        self.build_event_tab()  # Calls the method to build the event tab
+        self.build_venue_tab()  # Calls the method to build the venue tab
+        self.build_supplier_tab()  # Calls the method to build the supplier tab
+        self.build_guest_tab()  # Calls the method to build the guest tab
+        tab_control.pack(expand=1, fill="both")  # Packs the notebook to expand and fill the available space
+
+        # Add a button to display inputted data
+        self.display_button = ttk.Button(self, text="Display Input", command=self.display_input)
+        self.display_button.pack()  # Packs the button into the window
+
+    def build_employee_tab(self):
+        frame = ttk.LabelFrame(self.employee_tab,
+                               text="Manage Employees")  # Creates a frame for managing employees within the employee tab
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Places the frame in the grid layout
+
+        ttk.Label(frame, text="Name:").grid(row=0, column=0)  # Label for employee name entry
+        self.emp_name_entry = ttk.Entry(frame)  # Entry widget for employee name
+        self.emp_name_entry.grid(row=0, column=1)  # Places the name entry widget in the grid
+
+        ttk.Label(frame, text="Employee ID:").grid(row=1, column=0)  # Label for employee ID entry
+        self.emp_id_entry = ttk.Entry(frame)  # Entry widget for employee ID
+        self.emp_id_entry.grid(row=1, column=1)  # Places the ID entry widget in the grid
+
+        ttk.Label(frame, text="Age:").grid(row=2, column=0)  # Label for age entry
+        self.emp_age_entry = ttk.Entry(frame)  # Entry widget for employee age
+        self.emp_age_entry.grid(row=2, column=1)  # Places the age entry widget in the grid
+
+        ttk.Button(frame, text="Add Employee", command=self.add_employee).grid(row=3, column=0,
+                                                                               columnspan=2)  # Button to add an employee, triggers `add_employee`
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_employee).grid(row=4, column=0,
+                                                                                              columnspan=2)  # Button to delete selected employee
+
+        self.employee_list = ttk.Treeview(frame, columns=("ID", "Name", "Department"),
+                                          show="headings")  # Treeview for displaying employees
+        self.employee_list.grid(row=5, column=0, columnspan=2, sticky="nsew")  # Places the employee list in the grid
+        self.employee_list.heading("ID", text="ID")  # Column heading for ID
+        self.employee_list.heading("Name", text="Name")  # Column heading for Name
+        self.employee_list.heading("Department", text="Department")  # Column heading for Department
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_employees).grid(row=6, column=0,
+                                                                                    columnspan=2)  # Button to refresh the list of employees
+
+    def delete_selected_employee(self):
+        selected_items = self.employee_list.selection()  # Gets the selected item from the employee list
+        if selected_items:
+            selected_item = selected_items[0]
+            employee_id = self.employee_list.item(selected_item)['values'][0]
+            try:
+                self.employee_manager.delete_employee(employee_id)  # Attempts to delete the selected employee
+                self.employee_manager.save_employees()  # Saves the current state of employees
+                self.employee_list.delete(selected_item)  # Removes the item from the treeview
+            except KeyError:
+                messagebox.showerror("Error", "Employee not found.")  # Error message if employee is not found
+        else:
+            messagebox.showerror("Error", "No employee selected.")  # Error message if no employee is selected
+
+    def add_employee(self):
+        name = self.emp_name_entry.get().strip()  # Gets the name from the entry widget
+        employee_id_str = self.emp_id_entry.get().strip()  # Gets the employee ID from the entry widget
+        age_str = self.emp_age_entry.get().strip()  # Gets the age from the entry widget
+
+        if not name or not employee_id_str or not age_str:
+            messagebox.showerror("Error", "All fields must be provided.")  # Error if any field is empty
+            return
+
+        try:
+            employee_id = int(employee_id_str)  # Converts ID to integer
+            age = int(age_str)  # Converts age to integer
+            if age < 18:
+                raise ValueError("Employee must be at least 18 years old.")  # Checks age is at least 18
+
+            department = "Sales"  # Sets department to Sales
+            new_employee = Employee(name, employee_id, department, "Manager", 50000, age, datetime.now(), "Passport123",
+                                    None)
+            self.employee_manager.add_employee(new_employee)  # Adds the new employee
+            self.employee_manager.save_employees()  # Saves the current state of employees
+            self.refresh_employees()  # Refreshes the list of employees
+            messagebox.showinfo("Success", "Employee added successfully")  # Success message
+        except ValueError as ve:
+            messagebox.showerror("Error", str(ve))  # Error message for invalid values
+        except KeyError as ke:
+            messagebox.showerror("Error", str(ke))  # Error message for duplicate ID
+
+    def refresh_employees(self):
+        self.employee_list.delete(*self.employee_list.get_children())  # Clears all items from the treeview
+        for emp in self.employee_manager.employees.values():
+            self.employee_list.insert("", "end", values=(
+            emp.employee_id, emp.name, emp.department))  # Re-inserts all employees into the treeview
+
+    def build_client_tab(self):
+        frame = ttk.LabelFrame(self.client_tab,
+                               text="Manage Clients")  # Creates a frame for managing clients within the client tab
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Places the frame in the grid layout
+
+        ttk.Label(frame, text="Client Name:").grid(row=0, column=0)  # Label for client name entry
+        self.client_name_entry = ttk.Entry(frame)  # Entry widget for client name
+        self.client_name_entry.grid(row=0, column=1)  # Places the name entry widget in the grid
+
+        ttk.Button(frame, text="Add Client", command=self.add_client).grid(row=1, column=0,
+                                                                           columnspan=2)  # Button to add a client, triggers `add_client`
+
+        self.client_list = ttk.Treeview(frame, columns=("ID", "Name", "Contact"),
+                                        show="headings")  # Treeview for displaying clients
+        self.client_list.grid(row=2, column=0, columnspan=2, sticky='nsew')  # Places the client list in the grid
+        self.client_list.heading("ID", text="ID")  # Column heading for ID
+        self.client_list.heading("Name", text="Name")  # Column heading for Name
+        self.client_list.heading("Contact", text="Contact")  # Column heading for Contact
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_clients).grid(row=3, column=0,
+                                                                                  columnspan=2)  # Button to refresh the list of clients
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_client).grid(row=4, column=0,
+                                                                                            columnspan=2)  # Button to delete selected client
+
+    def add_client(self):
+        name = self.client_name_entry.get().strip()  # Retrieve and strip client name from input
+        if not name:
+            messagebox.showerror("Error", "Client name must be provided.")  # Show error if no name is given
+            return
+
+        client_id = str(uuid.uuid4())  # Generate a unique ID for the client
+        try:
+            new_client = Client(client_id, name, "123 Address", "123-456-7890", 10000)  # Create a new client object
+            self.client_manager.add_client(new_client)  # Add client to the client manager
+            self.client_manager.save_clients()  # Save current state of clients
+            self.refresh_clients()  # Refresh the display of clients
+            messagebox.showinfo("Success", "Client added successfully")  # Show success message
+        except KeyError as ke:
+            messagebox.showerror("Error", str(ke))  # Show error message if KeyError is raised
+
+    def refresh_clients(self):
+        self.client_list.delete(*self.client_list.get_children())  # Clear all entries in the client list
+        for client in self.client_manager.clients.values():
+            self.client_list.insert("", "end", values=(client.client_id, client.name, client.contact_details))  # Re-populate the client list
+
+    def delete_selected_client(self):
+        selected_items = self.client_list.selection()  # Get selected items from the client list
+        if selected_items:
+            selected_item = selected_items[0]
+            client_id = self.client_list.item(selected_item)['values'][0]
+            try:
+                self.client_manager.delete_client(client_id)  # Attempt to delete the selected client
+                self.client_manager.save_clients()  # Save the current state of clients
+                self.client_list.delete(selected_item)  # Remove the client from the list
+            except KeyError:
+                messagebox.showerror("Error", "Client not found.")  # Show error if client is not found
+        else:
+            messagebox.showerror("Error", "No client selected.")  # Show error if no client is selected
+
+    def build_event_tab(self):
+        frame = ttk.LabelFrame(self.event_tab, text="Manage Events")  # Create a frame for event management
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Place the frame in the grid
+
+        ttk.Label(frame, text="Event Name:").grid(row=0, column=0)  # Label for event name input
+        self.event_name_entry = ttk.Entry(frame)  # Entry widget for event name
+        self.event_name_entry.grid(row=0, column=1)  # Place the event name entry widget in the grid
+
+        ttk.Button(frame, text="Add Event", command=self.add_event).grid(row=1, column=0, columnspan=2)  # Button to add an event
+
+        self.event_list = ttk.Treeview(frame, columns=("ID", "Name", "Date", "Venue ID", "Description"), show="headings")  # Treeview to display events
+        self.event_list.grid(row=2, column=0, columnspan=2, sticky='nsew')  # Place the event list in the grid
+        self.event_list.heading("ID", text="ID")  # Column heading for ID
+        self.event_list.heading("Name", text="Name")  # Column heading for Name
+        self.event_list.heading("Date", text="Date")  # Column heading for Date
+        self.event_list.heading("Venue ID", text="Venue ID")  # Column heading for Venue ID
+        self.event_list.heading("Description", text="Description")  # Column heading for Description
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_events).grid(row=3, column=0, columnspan=2)  # Button to refresh the event list
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_event).grid(row=4, column=0, columnspan=2)  # Button to delete selected event
+
+    def add_event(self):
+        name = self.event_name_entry.get().strip()  # Retrieve and strip event name from input
+        if not name:
+            messagebox.showerror("Error", "Event name must be provided.")  # Show error if no name is given
+            return
+
+        event_id = str(uuid.uuid4())  # Generate a unique ID for the event
+        try:
+            new_event = Event(event_id, name, datetime.now(), "12345", "Sample Description")  # Create a new event object
+            self.event_manager.add_event(new_event)  # Add event to the event manager
+            self.event_manager.save_events()  # Save current state of events
+            self.refresh_events()  # Refresh the display of events
+            messagebox.showinfo("Success", "Event added successfully")  # Show success message
+        except KeyError as ke:
+            messagebox.showerror("Error", str(ke))  # Show error message if KeyError is raised
+
+    def refresh_events(self):
+        self.event_list.delete(*self.event_list.get_children())  # Clear all entries in the event list
+        for event in self.event_manager.events.values():
+            self.event_list.insert("", "end", values=(event.event_id, event.name, event.date.strftime("%Y-%m-%d"), event.venue_id, event.description))  # Re-populate the event list
+
+
+    def delete_selected_event(self):
+        selected_items = self.event_list.selection()  # Get selected items from the event list
+        if selected_items:
+            selected_item = selected_items[0]
+            event_id = self.event_list.item(selected_item)['values'][0]
+            try:
+                self.event_manager.delete_event(event_id)  # Attempt to delete the selected event
+                self.event_manager.save_events()  # Save the current state of events
+                self.event_list.delete(selected_item)  # Remove the event from the list
+            except KeyError:
+                messagebox.showerror("Error", "Event not found.")  # Show error if event is not found
+        else:
+            messagebox.showerror("Error", "No event selected.")  # Show error if no event is selected
+
+    def build_venue_tab(self):
+        frame = ttk.LabelFrame(self.venue_tab, text="Manage Venues")  # Create a frame for venue management
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Place the frame in the grid
+
+        ttk.Label(frame, text="Venue Name:").grid(row=0, column=0)  # Label for venue name input
+        self.venue_name_entry = ttk.Entry(frame)  # Entry widget for venue name
+        self.venue_name_entry.grid(row=0, column=1)  # Place the venue name entry widget in the grid
+
+        ttk.Label(frame, text="Location:").grid(row=1, column=0)  # Label for venue location input
+        self.location_entry = ttk.Entry(frame)  # Entry widget for venue location
+        self.location_entry.grid(row=1, column=1)  # Place the location entry widget in the grid
+
+        ttk.Label(frame, text="Capacity:").grid(row=2, column=0)  # Label for venue capacity input
+        self.capacity_entry = ttk.Entry(frame)  # Entry widget for venue capacity
+        self.capacity_entry.grid(row=2, column=1)  # Place the capacity entry widget in the grid
+
+        ttk.Button(frame, text="Add Venue", command=self.add_venue).grid(row=3, column=0, columnspan=2)  # Button to add a venue
+
+        self.venue_list = ttk.Treeview(frame, columns=("ID", "Name", "Location", "Capacity"), show="headings")  # Treeview to display venues
+        self.venue_list.grid(row=4, column=0, columnspan=2, sticky='nsew')  # Place the venue list in the grid
+        self.venue_list.heading("ID", text="ID")  # Column heading for ID
+        self.venue_list.heading("Name", text="Name")  # Column heading for Name
+        self.venue_list.heading("Location", text="Location")  # Column heading for Location
+        self.venue_list.heading("Capacity", text="Capacity")  # Column heading for Capacity
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_venues).grid(row=5, column=0, columnspan=2)  # Button to refresh the venue list
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_venue).grid(row=6, column=0, columnspan=2)  # Button to delete selected venue
+
+    def add_venue(self):
+        name = self.venue_name_entry.get().strip()  # Get and strip whitespace from venue name entry
+        location = self.location_entry.get().strip()  # Get and strip whitespace from location entry
+        capacity_str = self.capacity_entry.get().strip()  # Get and strip whitespace from capacity entry
+
+        if not name or not location or not capacity_str:
+            messagebox.showerror("Error", "All fields must be provided.")  # Show error if any field is empty
+            return
+
+        try:
+            capacity = int(capacity_str)  # Convert capacity string to integer
+            venue_id = str(uuid.uuid4())  # Generate a unique ID for the venue
+            new_venue = Venue(venue_id, name, location, capacity)  # Create a new venue object
+            self.venue_manager.add_venue(new_venue)  # Add venue to the venue manager
+            self.venue_manager.save_venues()  # Save the current state of venues
+            self.refresh_venues()  # Refresh the venue list display
+            messagebox.showinfo("Success", "Venue added successfully")  # Show success message
+        except ValueError:
+            messagebox.showerror("Error", "Capacity must be a valid integer.")  # Show error if capacity is not an integer
+
+    def refresh_venues(self):
+        self.venue_list.delete(*self.venue_list.get_children())  # Clear all entries in the venue list
+        for venue in self.venue_manager.venues.values():
+            self.venue_list.insert("", "end", values=(venue.venue_id, venue.name, venue.location, venue.capacity))  # Re-populate the venue list
+
+    def delete_selected_venue(self):
+        selected_items = self.venue_list.selection()  # Get selected items from the venue list
+        if selected_items:
+            selected_item = selected_items[0]
+            venue_id = self.venue_list.item(selected_item)['values'][0]
+            try:
+                self.venue_manager.delete_venue(venue_id)  # Attempt to delete the selected venue
+                self.venue_manager.save_venues()  # Save the current state of venues
+                self.venue_list.delete(selected_item)  # Remove the venue from the list
+            except KeyError:
+                messagebox.showerror("Error", "Venue not found.")  # Show error if venue is not found
+        else:
+            messagebox.showerror("Error", "No venue selected.")  # Show error if no venue is selected
+
+    def build_supplier_tab(self):
+        frame = ttk.LabelFrame(self.supplier_tab, text="Manage Suppliers")  # Create a frame for supplier management
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Place the frame in the grid
+
+        ttk.Label(frame, text="Supplier Name:").grid(row=0, column=0)  # Label for supplier name input
+        self.supplier_name_entry = ttk.Entry(frame)  # Entry widget for supplier name
+        self.supplier_name_entry.grid(row=0, column=1)  # Place the supplier name entry widget in the grid
+
+        ttk.Label(frame, text="Address:").grid(row=1, column=0)  # Label for supplier address input
+        self.supplier_address_entry = ttk.Entry(frame)  # Entry widget for supplier address
+        self.supplier_address_entry.grid(row=1, column=1)  # Place the address entry widget in the grid
+
+        ttk.Label(frame, text="Contact Details:").grid(row=2, column=0)  # Label for supplier contact details input
+        self.supplier_contact_entry = ttk.Entry(frame)  # Entry widget for supplier contact details
+        self.supplier_contact_entry.grid(row=2, column=1)  # Place the contact details entry widget in the grid
+
+        ttk.Button(frame, text="Add Supplier", command=self.add_supplier).grid(row=3, column=0, columnspan=2)  # Button to add a supplier
+
+        self.supplier_list = ttk.Treeview(frame, columns=("ID", "Name", "Address", "Contact Details"), show="headings")  # Treeview to display suppliers
+        self.supplier_list.grid(row=4, column=0, columnspan=2, sticky='nsew')  # Place the supplier list in the grid
+        self.supplier_list.heading("ID", text="ID")  # Column heading for ID
+        self.supplier_list.heading("Name", text="Name")  # Column heading for Name
+        self.supplier_list.heading("Address", text="Address")  # Column heading for Address
+        self.supplier_list.heading("Contact Details", text="Contact Details")  # Column heading for Contact Details
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_suppliers).grid(row=5, column=0, columnspan=2)  # Button to refresh the supplier list
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_supplier).grid(row=6, column=0, columnspan=2)  # Button to delete selected supplier
+
+    def add_supplier(self):
+        name = self.supplier_name_entry.get().strip()  # Retrieve and strip supplier name from input
+        address = self.supplier_address_entry.get().strip()  # Retrieve and strip address from input
+        contact_details = self.supplier_contact_entry.get().strip()  # Retrieve and strip contact details from input
+
+        if not name or not address or not contact_details:
+            messagebox.showerror("Error", "All fields must be provided.")  # Show error if any field is empty
+            return
+
+        supplier_id = str(uuid.uuid4())  # Generate a unique ID for the supplier
+        try:
+            new_supplier = Supplier(supplier_id, name, address, contact_details)  # Create a new supplier object
+            self.supplier_manager.add_supplier(new_supplier)  # Add supplier to the supplier manager
+            self.supplier_manager.save_suppliers()  # Save current state of suppliers
+            self.refresh_suppliers()  # Refresh the supplier list display
+            messagebox.showinfo("Success", "Supplier added successfully")  # Show success message
+        except KeyError as ke:
+            messagebox.showerror("Error", str(ke))  # Show error message if KeyError is raised
+
+    def refresh_suppliers(self):
+        self.supplier_list.delete(*self.supplier_list.get_children())  # Clear all entries in the supplier list
+        for supplier in self.supplier_manager.suppliers.values():
+            self.supplier_list.insert("", "end", values=(supplier.supplier_id, supplier.name, supplier.address, supplier.contact_details))  # Re-populate the supplier list
+
+    def delete_selected_supplier(self):
+        selected_items = self.supplier_list.selection()  # Get selected items from the supplier list
+        if selected_items:
+            selected_item = selected_items[0]  # Select the first item
+            supplier_id = self.supplier_list.item(selected_item)['values'][0]  # Get the supplier ID from the selected item
+            try:
+                self.supplier_manager.delete_supplier(supplier_id)  # Attempt to delete the selected supplier
+                self.supplier_manager.save_suppliers()  # Save the current state of suppliers
+                self.supplier_list.delete(selected_item)  # Remove the supplier from the list
+            except KeyError:
+                messagebox.showerror("Error", "Supplier not found.")  # Show error if supplier is not found
+        else:
+            messagebox.showerror("Error", "No supplier selected.")  # Show error if no supplier is selected
+
+    def build_guest_tab(self):
+        frame = ttk.LabelFrame(self.guest_tab, text="Manage Guests")  # Create a frame for guest management
+        frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")  # Place the frame in the grid
+
+        ttk.Label(frame, text="Guest Name:").grid(row=0, column=0)  # Label for guest name input
+        self.guest_name_entry = ttk.Entry(frame)  # Entry widget for guest name
+        self.guest_name_entry.grid(row=0, column=1)  # Place the guest name entry widget in the grid
+
+        ttk.Label(frame, text="Address:").grid(row=1, column=0)  # Label for guest address input
+        self.guest_address_entry = ttk.Entry(frame)  # Entry widget for guest address
+        self.guest_address_entry.grid(row=1, column=1)  # Place the address entry widget in the grid
+
+        ttk.Label(frame, text="Contact Details:").grid(row=2, column=0)  # Label for guest contact details input
+        self.guest_contact_entry = ttk.Entry(frame)  # Entry widget for guest contact details
+        self.guest_contact_entry.grid(row=2, column=1)  # Place the contact details entry widget in the grid
+
+        ttk.Button(frame, text="Add Guest", command=self.add_guest).grid(row=3, column=0, columnspan=2)  # Button to add a guest
+
+        self.guest_list = ttk.Treeview(frame, columns=("ID", "Name", "Address", "Contact Details"), show="headings")  # Treeview to display guests
+        self.guest_list.grid(row=4, column=0, columnspan=2, sticky='nsew')  # Place the guest list in the grid
+        self.guest_list.heading("ID", text="ID")  # Column heading for ID
+        self.guest_list.heading("Name", text="Name")  # Column heading for Name
+        self.guest_list.heading("Address", text="Address")  # Column heading for Address
+        self.guest_list.heading("Contact Details", text="Contact Details")  # Column heading for Contact Details
+
+        ttk.Button(frame, text="Refresh List", command=self.refresh_guests).grid(row=5, column=0, columnspan=2)  # Button to refresh the guest list
+
+        ttk.Button(frame, text="Delete Selected", command=self.delete_selected_guest).grid(row=6, column=0, columnspan=2)  # Button to delete selected guest
+
+    def add_guest(self):
+        name = self.guest_name_entry.get().strip()  # Retrieve and strip guest name from input
+        address = self.guest_address_entry.get().strip()  # Retrieve and strip address from input
+        contact_details = self.guest_contact_entry.get().strip()  # Retrieve and strip contact details from input
+
+        if not name or not address or not contact_details:
+            messagebox.showerror("Error", "All fields must be provided.")  # Show error if any field is empty
+            return
+
+        guest_id = str(uuid.uuid4())  # Generate a unique ID for the guest
+        try:
+            new_guest = Guest(guest_id, name, address, contact_details)  # Create a new guest object
+            self.guest_manager.add_guest(new_guest)  # Add guest to the guest manager
+            self.guest_manager.save_guests()  # Save current state of guests
+            self.refresh_guests()  # Refresh the guest list display
+            messagebox.showinfo("Success", "Guest added successfully")  # Show success message
+        except KeyError as ke:
+            messagebox.showerror("Error", str(ke))  # Show error message if KeyError is raised
+
+
+    def refresh_guests(self):
+        self.guest_list.delete(*self.guest_list.get_children())  # Clear all entries in the guest list
+        for guest in self.guest_manager.guests.values():
+            self.guest_list.insert("", "end", values=(guest.guest_id, guest.name, guest.address, guest.contact_details))  # Re-populate the guest list
+
+    def delete_selected_guest(self):
+        selected_items = self.guest_list.selection()  # Get selected items from the guest list
+        if selected_items:
+            selected_item = selected_items[0]  # Select the first item
+            guest_id = self.guest_list.item(selected_item)['values'][0]  # Get the guest ID from the selected item
+            try:
+                self.guest_manager.delete_guest(guest_id)  # Attempt to delete the selected guest
+                self.guest_manager.save_guests()  # Save the current state of guests
+                self.guest_list.delete(selected_item)  # Remove the guest from the list
+            except KeyError:
+                messagebox.showerror("Error", "Guest not found.")  # Show error if guest is not found
+        else:
+            messagebox.showerror("Error", "No guest selected.")  # Show error if no guest is selected
+
+    def display_input(self):
+        # Retrieve all the inputted data from the GUI elements
+        employee_data = self.get_employee_data()
+        client_data = self.get_client_data()
+        event_data = self.get_event_data()
+        venue_data = self.get_venue_data()
+        supplier_data = self.get_supplier_data()
+        guest_data = self.get_guest_data()
+
+        # Display the data in the desired output format
+        print("Employee Data:", employee_data)
+        print("Client Data:", client_data)
+        print("Event Data:", event_data)
+        print("Venue Data:", venue_data)
+        print("Supplier Data:", supplier_data)
+        print("Guest Data:", guest_data)
+
+    # Define functions to retrieve data from GUI elements (similar to refresh functions)
+    def get_employee_data(self):
+        employee_data = []  # Initialize an empty list to hold employee data
+        for emp in self.employee_manager.employees.values():
+            employee_data.append(emp.display())  # Add the displayed format of each employee's data to the list
+        return employee_data  # Return the list of employee data
+
+    def get_client_data(self):
+        client_data = []  # Initialize an empty list to hold client data
+        for client in self.client_manager.clients.values():
+            client_data.append(client.display())  # Add the displayed format of each client's data to the list
+        return client_data  # Return the list of client data
+
+    def get_event_data(self):
+        event_data = []  # Initialize an empty list to hold event data
+        for event in self.event_manager.events.values():
+            event_data.append(event.display())  # Add the displayed format of each event's data to the list
+        return event_data  # Return the list of event data
+
+    def get_venue_data(self):
+        venue_data = []  # Initialize an empty list to hold venue data
+        for venue in self.venue_manager.venues.values():
+            venue_data.append(venue.display())  # Add the displayed format of each venue's data to the list
+        return venue_data  # Return the list of venue data
+
+    def get_supplier_data(self):
+        supplier_data = []  # Initialize an empty list to hold supplier data
+        for supplier in self.supplier_manager.suppliers.values():
+            supplier_data.append(supplier.display())  # Add the displayed format of each supplier's data to the list
+        return supplier_data  # Return the list of supplier data
+
+    def get_guest_data(self):
+        guest_data = []  # Initialize an empty list to hold guest data
+        for guest in self.guest_manager.guests.values():
+            guest_data.append(guest.display())  # Add the displayed format of each guest's data to the list
+        return guest_data  # Return the list of guest data
+
+if __name__ == "__main__":
+    app = MainApplication()  # Create an instance of the MainApplication class
+    app.mainloop()  # Start the application's main event loop
